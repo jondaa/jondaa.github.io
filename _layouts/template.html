@@ -61,9 +61,65 @@
         ga('send', 'pageview');
       </script>
     {% endif %}
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const mainContent = document.getElementById('main_content');
+        if (!mainContent) return;
+
+        const headers = mainContent.querySelectorAll('h2[id]');
+
+        headers.forEach(header => {
+          // Add toggle indicator
+          const indicator = document.createElement('span');
+          indicator.classList.add('toggle-indicator');
+          indicator.textContent = '▶ '; // Collapsed state
+          header.insertBefore(indicator, header.firstChild);
+
+          // Get content elements to toggle
+          let elementsToToggle = [];
+          let nextElement = header.nextElementSibling;
+          while (nextElement && (nextElement.tagName !== 'H2' || !nextElement.hasAttribute('id'))) {
+            elementsToToggle.push(nextElement);
+            nextElement = nextElement.nextElementSibling;
+          }
+
+          // Initially hide sections (except summary)
+          if (header.id !== 'summary') {
+            elementsToToggle.forEach(el => el.classList.add('section-content', 'hidden'));
+            indicator.textContent = '▶ '; // Collapsed
+          } else {
+            elementsToToggle.forEach(el => el.classList.add('section-content'));
+            indicator.textContent = '▼ '; // Expanded
+          }
+          
+          header.addEventListener('click', function() {
+            const isHidden = elementsToToggle.some(el => el.classList.contains('hidden'));
+            elementsToToggle.forEach(el => {
+              el.classList.toggle('hidden');
+            });
+            // Update indicator
+            if (isHidden) {
+              indicator.textContent = '▼ '; // Expanded
+            } else {
+              indicator.textContent = '▶ '; // Collapsed
+            }
+          });
+        });
+      });
+    </script>
   </body>
   
   <style>
+.toggle-indicator {
+  margin-right: 10px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.section-content.hidden {
+  display: none;
+}
 
 ul {
   list-style-type: none;
